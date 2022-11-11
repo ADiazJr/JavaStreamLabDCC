@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -75,16 +76,17 @@ public class StreamLabService {
         // Return the list
         // Research 'java create specific date' and 'java compare dates'
         // You may need to use the helper classes imported above!
-    	
-        return null;
+        GregorianCalendar calendar = new GregorianCalendar(2016, Calendar.JANUARY, 1);
+        return users.findAll().stream().filter(user -> user.getRegistrationDate().before(calendar.getTime())).toList();
     }
 
     public List<User> RProblemFive()
     {
         // Write a query that gets all of the users who registered AFTER 2016 and BEFORE 2018
         // Return the list
-
-        return null;
+        GregorianCalendar afterCalendar = new GregorianCalendar(2016, Calendar.DECEMBER, 31);
+        GregorianCalendar beforeCalendar = new GregorianCalendar(2018, Calendar.JANUARY, 1);
+        return users.findAll().stream().filter(user -> user.getRegistrationDate().after(afterCalendar.getTime()) && user.getRegistrationDate().before(beforeCalendar.getTime())).toList();
     }
 
     // <><><><><><><><> R Actions (Read) with Foreign Keys <><><><><><><><><>
@@ -102,17 +104,21 @@ public class StreamLabService {
     {
         // Write a query that retrieves all of the products in the shopping cart of the user who has the email "afton@gmail.com".
         // Return the list
-
-    	return null;
+        User afton = users.findAll().stream().filter(user -> user.getEmail().equals("afton@gmail.com")).findFirst().orElse(null);
+        List<ShoppingcartItem> aftonItems = shoppingcartitems.findAll().stream().filter(shoppingcartItem -> shoppingcartItem.getUser().equals(afton)).toList();
+    	return aftonItems.stream().map(shoppingcartItem -> shoppingcartItem.getProduct()).toList();
     }
 
     public long RProblemSeven()
     {
         // Write a query that retrieves all of the products in the shopping cart of the user who has the email "oda@gmail.com" and returns the sum of all of the products prices.
     	// Remember to break the problem down and take it one step at a time!
-
-
-    	return 0;
+        User oda = users.findAll().stream().filter(user -> user.getEmail().equals("oda@gmail.com")).findFirst().orElse(null);
+        List<ShoppingcartItem> odaItems = shoppingcartitems.findAll().stream().filter(shoppingcartItem -> shoppingcartItem.getUser().equals(oda)).toList();
+        List<Product> odaProducts = odaItems.stream().map(shoppingcartItem -> shoppingcartItem.getProduct()).toList();
+        List<Integer> odaPrices = odaProducts.stream().map(product -> product.getPrice()).toList();
+        int sum = odaPrices.stream().mapToInt(Integer::intValue).sum();
+    	return sum;
 
     }
 
@@ -120,8 +126,11 @@ public class StreamLabService {
     {
         // Write a query that retrieves all of the products in the shopping cart of users who have the role of "Employee".
     	// Return the list
-
-    	return null;
+        Role employeeRole = roles.findAll().stream().filter(r -> r.getName().equals("Employee")).findFirst().orElse(null);
+        List<User> employees = users.findAll().stream().filter(user -> user.getRoles().contains(employeeRole)).toList();
+        List<List<ShoppingcartItem>> employeeItems = employees.stream().map(user -> user.getShoppingcartItems()).toList();
+        List<ShoppingcartItem> employeeItemsflat = employeeItems.stream().flatMap(shoppingcartItems -> shoppingcartItems.stream()).collect(Collectors.toList());
+    	return employeeItemsflat.stream().map(shoppingcartItem -> shoppingcartItem.getProduct()).toList();
     }
 
     // <><><><><><><><> CUD (Create, Update, Delete) Actions <><><><><><><><><>
