@@ -151,9 +151,13 @@ public class StreamLabService {
     {
         // Create a new Product object and add that product to the Products table.
         // Return the product
-    	
+    	Product newProduct = new Product();
+        newProduct.setDescription("Next Generation Gaming, Spider-Man Included");
+        newProduct.setName("PS5");
+        newProduct.setPrice(550);
+        products.save(newProduct);
 
-    	return null;
+    	return newProduct;
 
     }
 
@@ -171,8 +175,13 @@ public class StreamLabService {
     	// Create a new ShoppingCartItem to represent the new product you created being added to the new User you created's shopping cart.
         // Add the product you created to the user we created in the ShoppingCart junction table.
         // Return the ShoppingcartItem
-
-    	return null;
+        ShoppingcartItem PS5InCart = new ShoppingcartItem();
+        Product PS5 = products.findAll().stream().filter(product -> product.getName().equals("PS5")).findFirst().orElse(null);
+        User david = users.findAll().stream().filter(u -> u.getEmail().equals("david@gmail.com")).findFirst().orElse(null);
+        david.addShoppingcartItem(PS5InCart);
+        PS5.addShoppingcartItem(PS5InCart);
+        shoppingcartitems.save(PS5InCart);
+    	return PS5InCart;
     	
     }
 
@@ -190,7 +199,9 @@ public class StreamLabService {
     {
         // Update the price of the product you created to a different value.
         // Return the updated product
-    	return null;
+        Product PS5 = products.findAll().stream().filter(p -> p.getName().equals("PS5")).findFirst().orElse(null);
+        PS5.setPrice(650);
+    	return PS5;
     }
 
     public User UProblemTwo()
